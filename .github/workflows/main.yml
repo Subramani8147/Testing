@@ -1,0 +1,9 @@
+- name: Build Windows Installer MSI from exe file
+  # You may pin to the exact commit or the version.
+  # uses: AliceOh/CreateWindowsInstaller@e25bd3c3c5e139f0bdcec0d00a762690a80f532c
+  uses: AliceOh/CreateWindowsInstaller@1.0.0
+  with:
+    # exe file to wrap in the MSI installer
+    exefile: 
+    # what version to use for the built MSI
+    version: # optional, default is 0.0.1
