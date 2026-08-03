@@ -1,0 +1,119 @@
+/* ---------------------------------------------------------------------
+   IT Operations Knowledge Portal — design tokens
+   Direction: a native Windows "ops console" feel (Segoe UI + Consolas),
+   near-black slate surfaces, amber/teal/red status signal colors that
+   mirror server-rack indicator lights. Ticket/asset IDs render in
+   monospace "terminal tag" chips ([INC-2026-00001]) as the signature
+   element — it's the one place typography does double duty as data.
+   ------------------------------------------------------------------- */
+
+:root,
+[data-theme='dark'] {
+  --bg: #0F141B;
+  --bg-elevated: #131A22;
+  --panel: #171F29;
+  --panel-alt: #1D2732;
+  --panel-hover: #232F3C;
+  --border: #2A3444;
+  --border-soft: #212B38;
+
+  --text: #E7ECF2;
+  --text-muted: #8D9BAE;
+  --text-faint: #5C6B80;
+
+  --accent-amber: #E8A23D;
+  --accent-amber-dim: #4A3A1E;
+  --accent-teal: #34C7B3;
+  --accent-teal-dim: #16352F;
+  --accent-red: #E5566B;
+  --accent-red-dim: #3E1E24;
+  --accent-blue: #4C9FE8;
+  --accent-blue-dim: #1B3348;
+  --accent-violet: #9C8CE0;
+
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+}
+
+[data-theme='light'] {
+  --bg: #F2F4F7;
+  --bg-elevated: #FFFFFF;
+  --panel: #FFFFFF;
+  --panel-alt: #F7F8FA;
+  --panel-hover: #EDF0F4;
+  --border: #DBE1E9;
+  --border-soft: #E6EAEF;
+
+  --text: #1B2430;
+  --text-muted: #5B6B7D;
+  --text-faint: #92A0B1;
+
+  --accent-amber: #B4700A;
+  --accent-amber-dim: #FBEBD2;
+  --accent-teal: #0E8A76;
+  --accent-teal-dim: #DCF3EE;
+  --accent-red: #C13048;
+  --accent-red-dim: #FBE1E5;
+  --accent-blue: #1F6FC4;
+  --accent-blue-dim: #E1EDFB;
+  --accent-violet: #6C57C9;
+
+  --shadow: 0 8px 24px rgba(20, 30, 45, 0.10);
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI Variable', 'Segoe UI', -apple-system, system-ui, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden; /* app shell manages its own scroll regions */
+}
+
+.mono {
+  font-family: 'Cascadia Mono', 'Consolas', 'Courier New', monospace;
+  font-feature-settings: 'tnum';
+}
+
+.tag-id {
+  font-family: 'Cascadia Mono', 'Consolas', 'Courier New', monospace;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--accent-amber);
+  background: var(--accent-amber-dim);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.tag-id::before { content: '['; opacity: 0.6; }
+.tag-id::after { content: ']'; opacity: 0.6; }
+
+a { color: var(--accent-blue); }
+
+button {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
+:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
