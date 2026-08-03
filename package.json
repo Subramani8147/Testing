@@ -1,0 +1,97 @@
+{
+  "name": "it-operations-knowledge-portal",
+  "productName": "IT Operations Knowledge Portal",
+  "version": "1.0.0",
+  "description": "Offline Windows desktop app for IT SOPs, tickets/incidents, assets and user accounts.",
+  "author": "IT Operations Team",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "electron/main.js",
+  "homepage": "./",
+  "scripts": {
+    "dev:renderer": "vite",
+    "dev:electron": "cross-env NODE_ENV=development electron .",
+    "dev": "concurrently -k \"npm:dev:renderer\" \"npm:wait-and-launch\"",
+    "wait-and-launch": "wait-on tcp:5173 && npm run dev:electron",
+    "build:renderer": "vite build",
+    "postinstall": "electron-builder install-app-deps",
+    "seed": "node scripts/seed-demo-data.js",
+    "pack": "npm run build:renderer && electron-builder --dir",
+    "dist": "npm run build:renderer && electron-builder --win nsis portable",
+    "dist:msi": "npm run build:renderer && electron-builder --win msi",
+    "dist:all": "npm run build:renderer && electron-builder --win nsis portable msi"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "electron-log": "^5.1.7",
+    "electron-store": "^8.2.0",
+    "electron-updater": "^6.3.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^31.3.0",
+    "electron-builder": "^24.13.3",
+    "vite": "^5.4.0",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.itops.knowledgeportal",
+    "productName": "IT Operations Knowledge Portal",
+    "copyright": "Copyright (c) 2026 IT Operations Team",
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json",
+      "!node_modules/*/{CHANGELOG.md,README.md,readme.md}",
+      "!**/*.map"
+    ],
+    "extraResources": [
+      {
+        "from": "sample-data/knowledge.sample.db",
+        "to": "sample-data/knowledge.sample.db"
+      }
+    ],
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "IT-Operations-Knowledge-Portal-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "IT Operations Knowledge Portal",
+      "artifactName": "IT-Operations-Knowledge-Portal-Setup-${version}.${ext}",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "license": "docs/LICENSE.txt",
+      "menuCategory": "IT Operations"
+    },
+    "portable": {
+      "artifactName": "IT-Operations-Knowledge-Portal-Portable-${version}.${ext}"
+    },
+    "msi": {
+      "artifactName": "IT-Operations-Knowledge-Portal-Setup-${version}.${ext}",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "publish": null
+  }
+}
