@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Modal from '../components/Modal.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
+import ImportExcelModal from '../components/ImportExcelModal.jsx';
 import StatusPill from '../components/StatusPill.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -21,6 +22,7 @@ export default function Tickets() {
   const [detail, setDetail] = useState(null); // full ticket w/ comments
   const [comment, setComment] = useState('');
   const [toDelete, setToDelete] = useState(null);
+  const [importing, setImporting] = useState(false);
 
   const load = useCallback(() => {
     window.api.ticketsList({ status, priority, search }).then(setTickets);
@@ -84,6 +86,7 @@ export default function Tickets() {
           {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
         </select>
         <div className="spacer" />
+        <button className="btn" onClick={() => setImporting(true)}>Import from Excel</button>
         <button className="btn btn-primary" onClick={() => setCreating(true)}>+ New Ticket</button>
       </div>
 
@@ -184,6 +187,10 @@ export default function Tickets() {
             </div>
           </div>
         </Modal>
+      )}
+
+      {importing && (
+        <ImportExcelModal targetType="tickets" label="Tickets" onClose={() => setImporting(false)} onDone={load} />
       )}
 
       {toDelete && (

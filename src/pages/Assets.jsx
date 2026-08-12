@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Modal from '../components/Modal.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
+import ImportExcelModal from '../components/ImportExcelModal.jsx';
 import StatusPill from '../components/StatusPill.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -18,6 +19,7 @@ export default function Assets() {
   const [editing, setEditing] = useState(null); // { id } or null for create
   const [form, setForm] = useState(BLANK);
   const [toDelete, setToDelete] = useState(null);
+  const [importing, setImporting] = useState(false);
 
   const load = useCallback(() => {
     window.api.assetsList({ search, status }).then(setAssets);
@@ -63,6 +65,7 @@ export default function Assets() {
           {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
         <div className="spacer" />
+        <button className="btn" onClick={() => setImporting(true)}>Import from Excel</button>
         <button className="btn btn-primary" onClick={openNew}>+ New Asset</button>
       </div>
 
@@ -126,6 +129,10 @@ export default function Assets() {
           </div>
           <div className="field"><label>Notes</label><textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
         </Modal>
+      )}
+
+      {importing && (
+        <ImportExcelModal targetType="assets" label="Assets" onClose={() => setImporting(false)} onDone={load} />
       )}
 
       {toDelete && (
