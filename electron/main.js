@@ -16,6 +16,7 @@ const assetsIpc = require('./ipc/assets');
 const settingsIpc = require('./ipc/settings');
 const backupIpc = require('./ipc/backup-ipc');
 const filesIpc = require('./ipc/files');
+const importIpc = require('./ipc/import');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -244,6 +245,7 @@ app.whenReady().then(() => {
   settingsIpc.register({ getPaths, restartApp });
   backupIpc.register({ getPaths, restartApp });
   filesIpc.register({ getPaths });
+  importIpc.register(() => getPaths());
 
   ipcMain.handle('system:paths', () => getPaths());
   ipcMain.handle('system:notify', (evt, { title, body }) => notify(title, body));
