@@ -5,17 +5,12 @@ const logger = require('./logger');
 const db = require('./db');
 
 const ALLOWED_EXTENSIONS = new Set(['.db']);
-const MAX_UPLOAD_BYTES = 200 * 1024 * 1024; // 200MB safety ceiling for imports
+const MAX_UPLOAD_BYTES = 200 * 1024 * 1024;
 
-/**
- * Uses SQLite's online backup API (via better-sqlite3's .backup()) so the
- * copy is consistent even while the app is writing to the live database.
- */
 async function runBackup({ databaseFile, backupsDir, triggerType = 'scheduled', keepCount = 30 }) {
   const stamp = new Date().toISOString().slice(0, 10);
   let filename = `knowledge_${stamp}.db`;
   let target = path.join(backupsDir, filename);
-  // Avoid clobbering same-day manual + scheduled backups
   if (fs.existsSync(target) && triggerType === 'manual') {
     const time = new Date().toISOString().slice(11, 19).replace(/:/g, '-');
     filename = `knowledge_${stamp}_${time}.db`;
@@ -77,12 +72,6 @@ function listBackups(backupsDir) {
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
 
-/**
- * Restoring replaces the live database file. Caller MUST prompt the user
- * for confirmation before invoking this (enforced in the renderer + ipc
- * handler) and the app must be restarted afterwards to reopen a fresh
- * connection to the restored file.
- */
 function restoreBackup({ backupFile, databaseFile }) {
   const ext = path.extname(backupFile).toLowerCase();
   if (!ALLOWED_EXTENSIONS.has(ext)) {
@@ -92,7 +81,6 @@ function restoreBackup({ backupFile, databaseFile }) {
   if (stat.size > MAX_UPLOAD_BYTES) {
     throw new Error('Backup file exceeds the maximum allowed size.');
   }
-  // Validate it is actually an openable SQLite database before swapping.
   const test = new Database(backupFile, { readonly: true });
   test.pragma('quick_check');
   test.close();

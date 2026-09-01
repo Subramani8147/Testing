@@ -25,7 +25,6 @@ export default function Settings() {
   const [backups, setBackups] = useState([]);
   const [restoreTarget, setRestoreTarget] = useState(null);
   const [appInfo, setAppInfo] = useState(null);
-  const [confirmSample, setConfirmSample] = useState(false);
 
   const load = () => {
     window.api.settingsGet().then(setSettings);
@@ -43,11 +42,7 @@ export default function Settings() {
     const res = await window.api.settingsBrowseFolder({ title });
     if (res.canceled) return;
     const r = await window.api.settingsSetPath({ key, value: res.path });
-    if (r.requiresRestart) {
-      push('Location updated. Restart the app to apply this change.', 'success');
-    } else {
-      push('Updated.');
-    }
+    push(r.requiresRestart ? 'Location updated. Restart the app to apply this change.' : 'Updated.');
     load();
   };
 
@@ -68,13 +63,6 @@ export default function Settings() {
     setRestoreTarget(null);
     if (res.success) push('Restore complete. The app is restarting…');
     else push(res.error || 'Restore failed.', 'error');
-  };
-
-  const doLoadSampleData = async () => {
-    const res = await window.api.backupLoadSampleData({ actor: user });
-    setConfirmSample(false);
-    if (res.success) push('Sample data loaded. The app is restarting…');
-    else push(res.error || 'Failed to load sample data.', 'error');
   };
 
   const updateBackupSchedule = async (patch) => {
@@ -129,7 +117,6 @@ export default function Settings() {
         <div className="toolbar" style={{ marginTop: 6 }}>
           <button className="btn btn-primary" onClick={backupNow}>Backup now</button>
           <button className="btn" onClick={browseRestore}>Restore backup…</button>
-          <button className="btn" onClick={() => setLoadSampleConfirm(true)}>Load sample data…</button>
         </div>
         <div className="table-wrap" style={{ marginTop: 12 }}>
           <table>
@@ -186,15 +173,6 @@ export default function Settings() {
         </div>
       )}
 
-      <div className="card">
-        <div className="card-title">Demo / evaluation data</div>
-        <p className="text-muted" style={{ fontSize: 12.5, marginTop: 0 }}>
-          Loads the bundled sample database (demo users, SOPs, tickets and assets) so you can evaluate the
-          app quickly. This replaces your current data — a safety copy is kept automatically.
-        </p>
-        <button className="btn" onClick={() => setConfirmSample(true)}>Load sample data…</button>
-      </div>
-
       {restoreTarget && (
         <ConfirmDialog
           title="Restore backup"
@@ -202,16 +180,6 @@ export default function Settings() {
           confirmLabel="Restore"
           onConfirm={doRestore}
           onCancel={() => setRestoreTarget(null)}
-        />
-      )}
-
-      {confirmSample && (
-        <ConfirmDialog
-          title="Load sample data"
-          message="This replaces your current database with the bundled demo dataset (a safety copy of your current data is kept). The app will restart. Continue?"
-          confirmLabel="Load sample data"
-          onConfirm={doLoadSampleData}
-          onCancel={() => setConfirmSample(false)}
         />
       )}
     </div>

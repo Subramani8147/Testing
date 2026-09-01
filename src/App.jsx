@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import SOPs from './pages/SOPs.jsx';
 import Tickets from './pages/Tickets.jsx';
 import Assets from './pages/Assets.jsx';
+import ServerInventory from './pages/ServerInventory.jsx';
 import Users from './pages/Users.jsx';
 import Settings from './pages/Settings.jsx';
 import SearchResults from './pages/SearchResults.jsx';
@@ -19,6 +20,7 @@ const TITLES = {
   '/sops': 'SOPs & Knowledge Base',
   '/tickets': 'Tickets & Incidents',
   '/assets': 'Asset Inventory',
+  '/servers': 'Server Inventory',
   '/users': 'User Accounts',
   '/settings': 'Settings',
   '/search': 'Search Results'
@@ -38,6 +40,7 @@ function Shell() {
             <Route path="/sops" element={<SOPs />} />
             <Route path="/tickets" element={<Tickets />} />
             <Route path="/assets" element={<Assets />} />
+            <Route path="/servers" element={<ServerInventory />} />
             <Route path="/users" element={<Users />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/search" element={<SearchResults />} />

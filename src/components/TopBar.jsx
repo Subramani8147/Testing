@@ -33,12 +33,7 @@ export default function TopBar({ title }) {
       <h1>{title}</h1>
       <form className="search-box" onSubmit={onSearchSubmit}>
         <span>⌕</span>
-        <input
-          ref={searchRef}
-          placeholder="Search SOPs, tickets, assets..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+        <input ref={searchRef} placeholder="Search SOPs, tickets, assets..." value={query} onChange={(e) => setQuery(e.target.value)} />
         <span className="kbd">Ctrl+F</span>
       </form>
       <div className="topbar-actions">
@@ -50,11 +45,7 @@ export default function TopBar({ title }) {
             {user?.full_name?.[0]?.toUpperCase() || '?'}
           </button>
           {menuOpen && (
-            <div
-              className="card"
-              style={{ position: 'absolute', right: 0, top: 38, width: 200, padding: 10, zIndex: 50 }}
-              onMouseLeave={() => setMenuOpen(false)}
-            >
+            <div className="card" style={{ position: 'absolute', right: 0, top: 38, width: 200, padding: 10, zIndex: 50 }} onMouseLeave={() => setMenuOpen(false)}>
               <div style={{ fontSize: 13, fontWeight: 600 }}>{user?.full_name}</div>
               <div className="text-faint" style={{ fontSize: 11.5, marginBottom: 10 }}>{user?.role}</div>
               <button className="btn btn-sm" style={{ width: '100%' }} onClick={logout}>Sign out</button>

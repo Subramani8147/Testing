@@ -2,10 +2,6 @@ IT OPERATIONS KNOWLEDGE PORTAL - INTERNAL USE LICENSE
 
 This software is provided for internal use by the licensed organization's
 IT operations staff. It is distributed "as is," without warranty of any
-kind, express or implied, including but not limited to the warranties of
-merchantability, fitness for a particular purpose, and non-infringement.
+kind, express or implied.
 
 By clicking "I Agree" you accept these terms and proceed with installation.
-
-Replace this file with your organization's actual license terms before
-distributing outside your organization.

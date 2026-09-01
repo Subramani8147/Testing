@@ -1,10 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-/**
- * Lightweight rolling file logger. One file per day: app-YYYY-MM-DD.log
- * Levels: INFO, WARN, ERROR. Also mirrors to console in dev.
- */
 class Logger {
   constructor() {
     this.logsDir = null;
@@ -26,13 +22,7 @@ class Logger {
   }
 
   _write(level, category, message, meta) {
-    const line = JSON.stringify({
-      ts: new Date().toISOString(),
-      level,
-      category,
-      message,
-      ...(meta ? { meta } : {})
-    });
+    const line = JSON.stringify({ ts: new Date().toISOString(), level, category, message, ...(meta ? { meta } : {}) });
     if (this.isDev) {
       // eslint-disable-next-line no-console
       console.log(`[${level}] [${category}] ${message}`, meta || '');
@@ -41,23 +31,14 @@ class Logger {
     try {
       fs.appendFileSync(this._fileForToday(), line + '\n', 'utf8');
     } catch (err) {
-      // Last resort: stderr only, never throw from logging.
       // eslint-disable-next-line no-console
       console.error('Failed to write log file:', err.message);
     }
   }
 
-  info(category, message, meta) {
-    this._write('INFO', category, message, meta);
-  }
-
-  warn(category, message, meta) {
-    this._write('WARN', category, message, meta);
-  }
-
-  error(category, message, meta) {
-    this._write('ERROR', category, message, meta);
-  }
+  info(category, message, meta) { this._write('INFO', category, message, meta); }
+  warn(category, message, meta) { this._write('WARN', category, message, meta); }
+  error(category, message, meta) { this._write('ERROR', category, message, meta); }
 
   cleanupOldLogs() {
     if (!this.logsDir) return;

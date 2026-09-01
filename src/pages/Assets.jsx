@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Modal from '../components/Modal.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
-import ImportExcelModal from '../components/ImportExcelModal.jsx';
 import StatusPill from '../components/StatusPill.jsx';
+import ImportExcelModal from '../components/ImportExcelModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
@@ -16,7 +16,7 @@ export default function Assets() {
   const [assets, setAssets] = useState([]);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
-  const [editing, setEditing] = useState(null); // { id } or null for create
+  const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(BLANK);
   const [toDelete, setToDelete] = useState(null);
   const [importing, setImporting] = useState(false);

@@ -4,7 +4,6 @@ const Database = require('better-sqlite3');
 const logger = require('./logger');
 
 let db = null;
-
 const SCHEMA_VERSION = 1;
 
 function hashPassword(plain) {
@@ -44,7 +43,7 @@ function init(databaseFile) {
       username TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       full_name TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT 'technician', -- admin | technician | viewer
+      role TEXT NOT NULL DEFAULT 'technician',
       is_default INTEGER NOT NULL DEFAULT 0,
       active INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL,
@@ -70,8 +69,8 @@ function init(databaseFile) {
       id TEXT PRIMARY KEY,
       asset_tag TEXT UNIQUE NOT NULL,
       name TEXT NOT NULL,
-      type TEXT NOT NULL DEFAULT 'Other', -- Laptop | Desktop | Server | Network | Printer | Mobile | Other
-      status TEXT NOT NULL DEFAULT 'Active', -- Active | In Repair | Retired | Storage
+      type TEXT NOT NULL DEFAULT 'Other',
+      status TEXT NOT NULL DEFAULT 'Active',
       location TEXT,
       assigned_to TEXT,
       purchase_date TEXT,
@@ -86,8 +85,8 @@ function init(databaseFile) {
       ticket_number TEXT UNIQUE NOT NULL,
       title TEXT NOT NULL,
       description TEXT DEFAULT '',
-      status TEXT NOT NULL DEFAULT 'Open', -- Open | In Progress | Resolved | Closed
-      priority TEXT NOT NULL DEFAULT 'Medium', -- Low | Medium | High | Critical
+      status TEXT NOT NULL DEFAULT 'Open',
+      priority TEXT NOT NULL DEFAULT 'Medium',
       category TEXT DEFAULT 'General',
       requester TEXT,
       assigned_to TEXT,
@@ -108,12 +107,30 @@ function init(databaseFile) {
       FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS server_inventory (
+      id TEXT PRIMARY KEY,
+      hostname TEXT UNIQUE NOT NULL,
+      dc_name TEXT,
+      dc_number TEXT,
+      serial_number TEXT,
+      host_ip TEXT,
+      sva TEXT,
+      sva_ip TEXT,
+      model TEXT,
+      address TEXT,
+      site_manager TEXT,
+      alternate_contact TEXT,
+      phone TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS backup_log (
       id TEXT PRIMARY KEY,
       filename TEXT NOT NULL,
       size_bytes INTEGER,
-      status TEXT NOT NULL, -- Success | Failed
-      trigger_type TEXT NOT NULL DEFAULT 'scheduled', -- scheduled | manual
+      status TEXT NOT NULL,
+      trigger_type TEXT NOT NULL DEFAULT 'scheduled',
       created_at TEXT NOT NULL
     );
 
@@ -131,6 +148,7 @@ function init(databaseFile) {
     CREATE INDEX IF NOT EXISTS idx_tickets_priority ON tickets(priority);
     CREATE INDEX IF NOT EXISTS idx_assets_status ON assets(status);
     CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_log(created_at);
+    CREATE INDEX IF NOT EXISTS idx_servers_dcname ON server_inventory(dc_name);
   `);
 
   const metaRow = db.prepare('SELECT value FROM schema_meta WHERE key = ?').get('schema_version');
@@ -166,19 +184,10 @@ function closeDb() {
   }
 }
 
-/* ---------------------------- Audit helper ---------------------------- */
 function audit(userId, username, action, details) {
   db.prepare(
     `INSERT INTO audit_log (id, user_id, username, action, details, created_at) VALUES (?,?,?,?,?,?)`
   ).run(genId('AUD'), userId || null, username || 'system', action, details ? JSON.stringify(details) : null, new Date().toISOString());
 }
 
-module.exports = {
-  init,
-  getDb,
-  closeDb,
-  genId,
-  hashPassword,
-  verifyPassword,
-  audit
-};
+module.exports = { init, getDb, closeDb, genId, hashPassword, verifyPassword, audit };

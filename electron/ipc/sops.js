@@ -5,7 +5,7 @@ const db = require('../db');
 const logger = require('../logger');
 
 const ALLOWED_EXT = new Set(['.pdf', '.docx', '.doc', '.txt', '.md', '.png', '.jpg', '.jpeg', '.xlsx', '.csv']);
-const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50MB
+const MAX_FILE_BYTES = 50 * 1024 * 1024;
 
 function validateFile(filePath) {
   const ext = path.extname(filePath).toLowerCase();
@@ -61,9 +61,7 @@ function register(getSopsDir) {
     const existing = db.getDb().prepare('SELECT version FROM sops WHERE id = ?').get(id);
     if (!existing) return { success: false, error: 'SOP not found.' };
     db.getDb()
-      .prepare(
-        `UPDATE sops SET title=?, category=?, tags=?, content=?, version=?, updated_at=? WHERE id=?`
-      )
+      .prepare(`UPDATE sops SET title=?, category=?, tags=?, content=?, version=?, updated_at=? WHERE id=?`)
       .run(title, category, tags, content, existing.version + 1, new Date().toISOString(), id);
     db.audit(actor?.id, actor?.username, 'SOP_UPDATE', { id, title });
     return { success: true };
@@ -97,7 +95,6 @@ function register(getSopsDir) {
     return attachFile(getSopsDir(), actor, id, result.filePaths[0]);
   });
 
-  // Used for drag-and-drop: renderer sends the dropped file's absolute path.
   ipcMain.handle('sops:attachDropped', (evt, { actor, id, filePath }) => {
     return attachFile(getSopsDir(), actor, id, filePath);
   });

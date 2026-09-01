@@ -66,9 +66,7 @@ export default function Users() {
                   <div className="text-faint mono" style={{ fontSize: 11.5 }}>{u.username}</div>
                 </td>
                 <td className="text-muted">{u.role}</td>
-                <td>
-                  <span className={`pill ${u.active ? 'teal' : 'gray'}`}><span className="dot" />{u.active ? 'Active' : 'Deactivated'}</span>
-                </td>
+                <td><span className={`pill ${u.active ? 'teal' : 'gray'}`}><span className="dot" />{u.active ? 'Active' : 'Deactivated'}</span></td>
                 <td className="text-muted">{u.last_login ? new Date(u.last_login).toLocaleString() : 'Never'}</td>
                 <td onClick={(e) => e.stopPropagation()} style={{ display: 'flex', gap: 6 }}>
                   <button className="btn btn-ghost btn-sm" onClick={() => setResetTarget(u)}>Reset password</button>

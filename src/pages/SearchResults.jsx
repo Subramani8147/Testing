@@ -9,15 +9,17 @@ export default function SearchResults() {
   const [sops, setSops] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [assets, setAssets] = useState([]);
+  const [servers, setServers] = useState([]);
 
   useEffect(() => {
     if (!q) return;
     window.api.sopsList({ search: q }).then(setSops);
     window.api.ticketsList({ search: q }).then(setTickets);
     window.api.assetsList({ search: q }).then(setAssets);
+    window.api.serversList({ search: q }).then(setServers);
   }, [q]);
 
-  const total = sops.length + tickets.length + assets.length;
+  const total = sops.length + tickets.length + assets.length + servers.length;
 
   return (
     <div>
@@ -73,6 +75,25 @@ export default function SearchResults() {
                     <td className="mono">{a.asset_tag}</td>
                     <td>{a.name}</td>
                     <td><StatusPill value={a.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {servers.length > 0 && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          <div className="card-title">Server Inventory</div>
+          <div className="table-wrap">
+            <table>
+              <tbody>
+                {servers.map((s) => (
+                  <tr key={s.id} onClick={() => navigate('/servers')}>
+                    <td className="mono">{s.hostname}</td>
+                    <td className="text-muted">{s.dc_name || '—'}</td>
+                    <td className="mono text-muted">{s.host_ip || '—'}</td>
                   </tr>
                 ))}
               </tbody>

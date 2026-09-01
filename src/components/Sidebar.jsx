@@ -6,7 +6,8 @@ const NAV = [
   { to: '/', label: 'Dashboard', icon: '▣', end: true },
   { to: '/sops', label: 'SOPs & Knowledge', icon: '▤' },
   { to: '/tickets', label: 'Tickets & Incidents', icon: '◈' },
-  { to: '/assets', label: 'Assets', icon: '▦' }
+  { to: '/assets', label: 'Assets', icon: '▦' },
+  { to: '/servers', label: 'Server Inventory', icon: '▧' }
 ];
 
 const ADMIN_NAV = [
@@ -35,12 +36,7 @@ export default function Sidebar() {
       </div>
 
       {NAV.map((item) => (
-        <NavLink
-          key={item.to}
-          to={item.to}
-          end={item.end}
-          className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
-        >
+        <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}>
           <span className="icon">{item.icon}</span>
           {item.label}
         </NavLink>

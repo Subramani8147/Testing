@@ -1,7 +1,7 @@
 {
   "name": "it-operations-knowledge-portal",
   "productName": "IT Operations Knowledge Portal",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Offline Windows desktop app for IT SOPs, tickets/incidents, assets and user accounts.",
   "author": "IT Operations Team",
   "license": "UNLICENSED",

@@ -1,7 +1,6 @@
 const { ipcMain, dialog, app } = require('electron');
 const store = require('../settings-store');
 const logger = require('../logger');
-const db = require('../db');
 
 function register({ getPaths, restartApp }) {
   ipcMain.handle('settings:get', () => ({
@@ -32,9 +31,6 @@ function register({ getPaths, restartApp }) {
   });
 
   ipcMain.handle('settings:setAutoUpdate', (evt, enabled) => {
-    // Kept OFF by default; this only flips the persisted flag. The actual
-    // electron-updater wiring is stubbed in updater.js and stays inert
-    // unless this is explicitly enabled AND a publish feed is configured.
     store.set('autoUpdate.enabled', enabled);
     logger.info('SETTINGS', 'Auto-update flag changed', { enabled });
     return { success: true };
@@ -46,8 +42,6 @@ function register({ getPaths, restartApp }) {
     return { canceled: false, path: result.filePaths[0] };
   });
 
-  // Changing database/SOPs/backups/uploads location requires a restart so
-  // main.js can re-resolve paths and reopen the DB connection cleanly.
   ipcMain.handle('settings:setPath', async (evt, { key, value }) => {
     const allowed = new Set(['database', 'sops', 'backups', 'uploads', 'exportFolder', 'importFolder']);
     if (!allowed.has(key)) return { success: false, error: 'Unknown path key.' };

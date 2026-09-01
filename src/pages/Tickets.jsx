@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Modal from '../components/Modal.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
-import ImportExcelModal from '../components/ImportExcelModal.jsx';
 import StatusPill from '../components/StatusPill.jsx';
+import ImportExcelModal from '../components/ImportExcelModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
@@ -19,7 +19,7 @@ export default function Tickets() {
   const [search, setSearch] = useState('');
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState(BLANK);
-  const [detail, setDetail] = useState(null); // full ticket w/ comments
+  const [detail, setDetail] = useState(null);
   const [comment, setComment] = useState('');
   const [toDelete, setToDelete] = useState(null);
   const [importing, setImporting] = useState(false);

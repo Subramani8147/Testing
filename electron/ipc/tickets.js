@@ -13,18 +13,9 @@ function register() {
   ipcMain.handle('tickets:list', (evt, { status, priority, search, assignedTo } = {}) => {
     let query = 'SELECT * FROM tickets WHERE 1=1';
     const params = [];
-    if (status) {
-      query += ' AND status = ?';
-      params.push(status);
-    }
-    if (priority) {
-      query += ' AND priority = ?';
-      params.push(priority);
-    }
-    if (assignedTo) {
-      query += ' AND assigned_to = ?';
-      params.push(assignedTo);
-    }
+    if (status) { query += ' AND status = ?'; params.push(status); }
+    if (priority) { query += ' AND priority = ?'; params.push(priority); }
+    if (assignedTo) { query += ' AND assigned_to = ?'; params.push(assignedTo); }
     if (search) {
       query += ' AND (title LIKE ? OR ticket_number LIKE ? OR requester LIKE ?)';
       const like = `%${search}%`;

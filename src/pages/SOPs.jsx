@@ -13,7 +13,7 @@ export default function SOPs() {
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
-  const [editing, setEditing] = useState(null); // sop object or null
+  const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(BLANK);
   const [dragActive, setDragActive] = useState(false);
   const [toDelete, setToDelete] = useState(null);
@@ -26,9 +26,7 @@ export default function SOPs() {
   useEffect(() => { load(); }, [load]);
 
   useEffect(() => {
-    const off = window.api.onShortcut('shortcut:save', () => {
-      if (editing) saveForm();
-    });
+    const off = window.api.onShortcut('shortcut:save', () => { if (editing) saveForm(); });
     return off;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editing, form]);
@@ -40,18 +38,10 @@ export default function SOPs() {
   const saveForm = async () => {
     if (!form.title.trim()) { push('Title is required.', 'error'); return; }
     let res;
-    if (editing.id) {
-      res = await window.api.sopsUpdate({ actor: user, id: editing.id, ...form });
-    } else {
-      res = await window.api.sopsCreate({ actor: user, ...form });
-    }
-    if (res.success) {
-      push(editing.id ? 'SOP updated.' : 'SOP created.');
-      close();
-      load();
-    } else {
-      push(res.error || 'Save failed.', 'error');
-    }
+    if (editing.id) res = await window.api.sopsUpdate({ actor: user, id: editing.id, ...form });
+    else res = await window.api.sopsCreate({ actor: user, ...form });
+    if (res.success) { push(editing.id ? 'SOP updated.' : 'SOP created.'); close(); load(); }
+    else push(res.error || 'Save failed.', 'error');
   };
 
   const confirmDelete = async () => {
@@ -94,16 +84,11 @@ export default function SOPs() {
       </div>
 
       {sops.length === 0 ? (
-        <div className="empty-state">
-          <div className="icon">▤</div>
-          No SOPs found. Create the first one to build your knowledge base.
-        </div>
+        <div className="empty-state"><div className="icon">▤</div>No SOPs found. Create the first one to build your knowledge base.</div>
       ) : (
         <div className="table-wrap">
           <table>
-            <thead>
-              <tr><th>Title</th><th>Category</th><th>Tags</th><th>Attachment</th><th>Updated</th><th></th></tr>
-            </thead>
+            <thead><tr><th>Title</th><th>Category</th><th>Tags</th><th>Attachment</th><th>Updated</th><th></th></tr></thead>
             <tbody>
               {sops.map((s) => (
                 <tr key={s.id} onClick={() => openEdit(s)}>

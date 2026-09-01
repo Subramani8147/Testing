@@ -17,7 +17,13 @@ export default function ImportExcelModal({ targetType, label, onClose, onDone })
   const [importing, setImporting] = useState(false);
 
   const browse = async () => {
-    const res = await window.api.importBrowseFile();
+    let res;
+    try {
+      res = await window.api.importBrowseFile();
+    } catch (err) {
+      push(err.message || 'Could not open the file picker. Check that the app was rebuilt with the import patch.', 'error');
+      return;
+    }
     if (res.canceled) return;
     setFilePath(res.path);
     setResult(null);
@@ -44,8 +50,12 @@ export default function ImportExcelModal({ targetType, label, onClose, onDone })
   };
 
   const downloadTemplate = async () => {
-    const res = await window.api.importDownloadTemplate({ targetType });
-    if (!res.canceled) push(`Template saved to ${res.path}`);
+    try {
+      const res = await window.api.importDownloadTemplate({ targetType });
+      if (!res.canceled) push(`Template saved to ${res.path}`);
+    } catch (err) {
+      push(err.message || 'Could not generate the template.', 'error');
+    }
   };
 
   return (

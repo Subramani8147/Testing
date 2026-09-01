@@ -6,9 +6,7 @@ export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState('dark');
 
   useEffect(() => {
-    window.api.settingsGet().then((s) => {
-      if (s?.theme) setThemeState(s.theme);
-    });
+    window.api.settingsGet().then((s) => { if (s?.theme) setThemeState(s.theme); });
   }, []);
 
   useEffect(() => {

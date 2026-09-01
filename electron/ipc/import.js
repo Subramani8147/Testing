@@ -43,6 +43,26 @@ const SPECS = {
       { key: 'category', field: 'category', header: 'Category', default: 'General' },
       { key: 'requester', field: 'requester', header: 'Requester', default: '' }
     ]
+  },
+  servers: {
+    table: 'server_inventory',
+    idPrefix: 'SRV',
+    columns: [
+      { key: 'esxihostname', field: 'hostname', header: 'ESXi HostName', required: true },
+      { key: 'dcname', field: 'dc_name', header: 'DC Name', default: '' },
+      { key: 'dc', field: 'dc_number', header: 'DC #', default: '' },
+      { key: 'serialnumber', field: 'serial_number', header: 'Serial Number', default: '' },
+      { key: 'hostip', field: 'host_ip', header: 'Host IP', default: '' },
+      { key: 'sva', field: 'sva', header: 'SVA', default: '' },
+      { key: 'svaip', field: 'sva_ip', header: 'SVA IP', default: '' },
+      { key: 'model', field: 'model', header: 'Model', default: '' },
+      { key: 'address', field: 'address', header: 'Address', default: '' },
+      { key: 'sitemanager', field: 'site_manager', header: 'Site Manager', default: '' },
+      { key: 'alternatecontact', field: 'alternate_contact', header: 'Alternate contact', default: '' },
+      { key: 'phone', field: 'phone', header: 'Phone#', default: '' }
+    ],
+    uniqueField: 'hostname',
+    uniqueHeader: 'ESXi HostName'
   }
 };
 
@@ -154,6 +174,11 @@ function register(getPaths) {
           `INSERT INTO tickets (id, ticket_number, title, description, status, priority, category, requester, created_at, updated_at)
            VALUES (?,?,?,?,?,?,?,?,?,?)`
         ).run(id, ticketNumber, mapped.title, mapped.description, mapped.status, mapped.priority, mapped.category, mapped.requester, now, now);
+      } else if (targetType === 'servers') {
+        database.prepare(
+          `INSERT INTO server_inventory (id, hostname, dc_name, dc_number, serial_number, host_ip, sva, sva_ip, model, address, site_manager, alternate_contact, phone, created_at, updated_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+        ).run(id, mapped.hostname, mapped.dc_name, mapped.dc_number, mapped.serial_number, mapped.host_ip, mapped.sva, mapped.sva_ip, mapped.model, mapped.address, mapped.site_manager, mapped.alternate_contact, mapped.phone, now, now);
       }
       created += 1;
     });

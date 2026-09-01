@@ -1,8 +1,8 @@
-const { app, BrowserWindow, Menu, Tray, Notification, shell, ipcMain, nativeTheme } = require('electron');
+const { app, BrowserWindow, Menu, Tray, Notification, shell, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
-const { resolvePaths, getDefaultBaseDir } = require('./paths');
+const { resolvePaths } = require('./paths');
 const logger = require('./logger');
 const db = require('./db');
 const store = require('./settings-store');
@@ -17,6 +17,7 @@ const settingsIpc = require('./ipc/settings');
 const backupIpc = require('./ipc/backup-ipc');
 const filesIpc = require('./ipc/files');
 const importIpc = require('./ipc/import');
+const serversIpc = require('./ipc/servers');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -26,7 +27,6 @@ let currentPaths = null;
 let backupTimer = null;
 let isQuitting = false;
 
-// --- Single instance lock: prevent two copies writing to the same SQLite file
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
@@ -68,9 +68,6 @@ function initializeDatabase() {
 
 function scheduleBackups() {
   if (backupTimer) clearInterval(backupTimer);
-  // Checks every minute whether it's time for the configured daily backup.
-  // Simpler and more robust across sleep/wake cycles than a long-lived
-  // setTimeout, and avoids pulling in a cron dependency.
   let lastRunDate = null;
   backupTimer = setInterval(async () => {
     const cfg = store.get('backup');
@@ -78,7 +75,7 @@ function scheduleBackups() {
     const now = new Date();
     const today = now.toISOString().slice(0, 10);
     if (lastRunDate === today) return;
-    const isWeeklyDue = cfg.schedule === 'weekly' ? now.getDay() === 1 : true; // Mondays for weekly
+    const isWeeklyDue = cfg.schedule === 'weekly' ? now.getDay() === 1 : true;
     if (now.getHours() === (cfg.hour ?? 2) && isWeeklyDue) {
       lastRunDate = today;
       const paths = getPaths();
@@ -88,11 +85,8 @@ function scheduleBackups() {
         triggerType: 'scheduled',
         keepCount: cfg.keepCount || 30
       });
-      if (result.success) {
-        notify('Backup complete', `Database backed up to ${result.filename}`);
-      } else {
-        notify('Backup failed', result.error || 'Unknown error');
-      }
+      if (result.success) notify('Backup complete', `Database backed up to ${result.filename}`);
+      else notify('Backup failed', result.error || 'Unknown error');
     }
   }, 60 * 1000);
 }
@@ -127,53 +121,32 @@ function buildMenu() {
         { type: 'separator' },
         { label: 'Backup Now', accelerator: 'CmdOrCtrl+B', click: () => mainWindow?.webContents.send('shortcut:backupNow') },
         { type: 'separator' },
-        {
-          label: 'Exit',
-          click: () => { isQuitting = true; app.quit(); }
-        }
+        { label: 'Exit', click: () => { isQuitting = true; app.quit(); } }
       ]
     },
     {
       label: 'Edit',
       submenu: [
         { label: 'Find', accelerator: 'CmdOrCtrl+F', click: () => mainWindow?.webContents.send('shortcut:find') },
-        { role: 'undo' },
-        { role: 'redo' },
-        { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' }
+        { role: 'undo' }, { role: 'redo' }, { type: 'separator' },
+        { role: 'cut' }, { role: 'copy' }, { role: 'paste' }
       ]
     },
     {
       label: 'View',
       submenu: [
-        { role: 'reload' },
-        { role: 'toggleDevTools', visible: isDev },
-        { type: 'separator' },
-        { role: 'resetZoom' },
-        { role: 'zoomIn' },
-        { role: 'zoomOut' },
-        { type: 'separator' },
+        { role: 'reload' }, { role: 'toggleDevTools' }, { type: 'separator' },
+        { role: 'resetZoom' }, { role: 'zoomIn' }, { role: 'zoomOut' }, { type: 'separator' },
         { role: 'togglefullscreen' }
       ]
     },
     {
       label: 'Help',
       submenu: [
-        {
-          label: 'Open Logs Folder',
-          click: () => shell.openPath(getPaths().logs)
-        },
-        {
-          label: 'Open Data Folder',
-          click: () => shell.openPath(getPaths().base)
-        },
+        { label: 'Open Logs Folder', click: () => shell.openPath(getPaths().logs) },
+        { label: 'Open Data Folder', click: () => shell.openPath(getPaths().base) },
         { type: 'separator' },
-        {
-          label: 'About',
-          click: () => mainWindow?.webContents.send('shortcut:about')
-        }
+        { label: 'About', click: () => mainWindow?.webContents.send('shortcut:about') }
       ]
     }
   ];
@@ -193,7 +166,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false // needed so preload can use webUtils for drag-and-drop file paths
+      sandbox: false
     }
   });
 
@@ -222,18 +195,13 @@ function createWindow() {
 app.on('before-quit', () => { isQuitting = true; });
 
 app.whenReady().then(() => {
-  // High-DPI: Electron/Chromium auto-scales per-monitor on Windows 10/11;
-  // no extra flags required. We just avoid fixed pixel assumptions in CSS
-  // (rem-based layout, see src/styles).
-
   try {
     initializePaths();
     logger.init(getPaths().logs, store.get('logRetentionDays', 90));
     logger.info('SYSTEM', 'Application starting', { version: app.getVersion(), platform: process.platform });
     initializeDatabase();
   } catch (err) {
-    logger.error?.('SYSTEM', 'Fatal startup error', { error: err.message }) ||
-      console.error('Fatal startup error:', err);
+    console.error('Fatal startup error:', err);
     app.quit();
     return;
   }
@@ -246,6 +214,7 @@ app.whenReady().then(() => {
   backupIpc.register({ getPaths, restartApp });
   filesIpc.register({ getPaths });
   importIpc.register(() => getPaths());
+  serversIpc.register();
 
   ipcMain.handle('system:paths', () => getPaths());
   ipcMain.handle('system:notify', (evt, { title, body }) => notify(title, body));

@@ -11,14 +11,8 @@ function register() {
       const like = `%${search}%`;
       params.push(like, like, like);
     }
-    if (status) {
-      query += ' AND status = ?';
-      params.push(status);
-    }
-    if (type) {
-      query += ' AND type = ?';
-      params.push(type);
-    }
+    if (status) { query += ' AND status = ?'; params.push(status); }
+    if (type) { query += ' AND type = ?'; params.push(type); }
     query += ' ORDER BY updated_at DESC';
     return db.getDb().prepare(query).all(...params);
   });
@@ -48,21 +42,11 @@ function register() {
     const sets = [];
     const params = [];
     const map = {
-      assetTag: 'asset_tag',
-      name: 'name',
-      type: 'type',
-      status: 'status',
-      location: 'location',
-      assignedTo: 'assigned_to',
-      purchaseDate: 'purchase_date',
-      warrantyExpiry: 'warranty_expiry',
-      notes: 'notes'
+      assetTag: 'asset_tag', name: 'name', type: 'type', status: 'status', location: 'location',
+      assignedTo: 'assigned_to', purchaseDate: 'purchase_date', warrantyExpiry: 'warranty_expiry', notes: 'notes'
     };
     for (const [camel, col] of Object.entries(map)) {
-      if (fields[camel] !== undefined) {
-        sets.push(`${col} = ?`);
-        params.push(fields[camel]);
-      }
+      if (fields[camel] !== undefined) { sets.push(`${col} = ?`); params.push(fields[camel]); }
     }
     sets.push('updated_at = ?');
     params.push(new Date().toISOString());

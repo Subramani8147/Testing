@@ -1,6 +1,4 @@
-const { ipcMain, dialog, app } = require('electron');
-const path = require('path');
-const fs = require('fs');
+const { ipcMain, dialog } = require('electron');
 const backupEngine = require('../backup');
 const store = require('../settings-store');
 const logger = require('../logger');
@@ -40,39 +38,15 @@ function register({ getPaths, restartApp }) {
     return { canceled: false, path: result.filePaths[0] };
   });
 
-  // The renderer MUST show a confirmation dialog before calling this --
-  // restoring overwrites the live database.
   ipcMain.handle('backup:restore', (evt, { actor, backupFile }) => {
     const paths = getPaths();
     try {
       const result = backupEngine.restoreBackup({ backupFile, databaseFile: paths.databaseFile });
       logger.warn('BACKUP', 'Restore executed, restarting app', { backupFile, actor: actor?.username });
-      // App must restart to safely reopen the swapped-in database file.
       setTimeout(() => restartApp(), 500);
       return result;
     } catch (err) {
       logger.error('BACKUP', 'Restore failed', { error: err.message });
-      return { success: false, error: err.message };
-    }
-  });
-
-  // Loads the bundled sample database (with demo SOPs/tickets/assets/users)
-  // over the live one. Same safety copy + restart behavior as a restore,
-  // used for evaluation/demo purposes. Renderer must confirm first.
-  ipcMain.handle('backup:loadSampleData', (evt, { actor } = {}) => {
-    const paths = getPaths();
-    const sampleDb = app.isPackaged
-      ? path.join(process.resourcesPath, 'sample-data', 'knowledge.sample.db')
-      : path.join(__dirname, '..', '..', 'sample-data', 'knowledge.sample.db');
-    if (!fs.existsSync(sampleDb)) {
-      return { success: false, error: 'Sample database was not found in this build.' };
-    }
-    try {
-      const result = backupEngine.restoreBackup({ backupFile: sampleDb, databaseFile: paths.databaseFile });
-      logger.warn('SYSTEM', 'Sample/demo data loaded, restarting app', { actor: actor?.username });
-      setTimeout(() => restartApp(), 500);
-      return result;
-    } catch (err) {
       return { success: false, error: err.message };
     }
   });

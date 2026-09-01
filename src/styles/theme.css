@@ -1,12 +1,3 @@
-/* ---------------------------------------------------------------------
-   IT Operations Knowledge Portal — design tokens
-   Direction: a native Windows "ops console" feel (Segoe UI + Consolas),
-   near-black slate surfaces, amber/teal/red status signal colors that
-   mirror server-rack indicator lights. Ticket/asset IDs render in
-   monospace "terminal tag" chips ([INC-2026-00001]) as the signature
-   element — it's the one place typography does double duty as data.
-   ------------------------------------------------------------------- */
-
 :root,
 [data-theme='dark'] {
   --bg: #0F141B;
@@ -65,10 +56,7 @@
 
 * { box-sizing: border-box; }
 
-html, body, #root {
-  height: 100%;
-  margin: 0;
-}
+html, body, #root { height: 100%; margin: 0; }
 
 body {
   background: var(--bg);
@@ -76,43 +64,28 @@ body {
   font-family: 'Segoe UI Variable', 'Segoe UI', -apple-system, system-ui, sans-serif;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
-  overflow: hidden; /* app shell manages its own scroll regions */
+  overflow: hidden;
 }
 
-.mono {
-  font-family: 'Cascadia Mono', 'Consolas', 'Courier New', monospace;
-  font-feature-settings: 'tnum';
-}
+.mono { font-family: 'Cascadia Mono', 'Consolas', 'Courier New', monospace; font-feature-settings: 'tnum'; }
 
 .tag-id {
   font-family: 'Cascadia Mono', 'Consolas', 'Courier New', monospace;
-  font-size: 12px;
-  letter-spacing: 0.02em;
-  color: var(--accent-amber);
-  background: var(--accent-amber-dim);
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
-  white-space: nowrap;
+  font-size: 12px; letter-spacing: 0.02em; color: var(--accent-amber);
+  background: var(--accent-amber-dim); padding: 2px 8px; border-radius: var(--radius-sm); white-space: nowrap;
 }
-
 .tag-id::before { content: '['; opacity: 0.6; }
 .tag-id::after { content: ']'; opacity: 0.6; }
 
 a { color: var(--accent-blue); }
-
-button {
-  font-family: inherit;
-}
+button { font-family: inherit; }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
 
-:focus-visible {
-  outline: 2px solid var(--accent-blue);
-  outline-offset: 2px;
-}
+:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
 
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
